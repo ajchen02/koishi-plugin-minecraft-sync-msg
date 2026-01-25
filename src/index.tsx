@@ -309,7 +309,7 @@ class MinecraftSyncMsg {
         "data": {
           "message": [
             {
-              "text": (this.ctx.i18n.render([this.config.locale? this.config.locale:'zh-CN'], ['minecraft-sync-msg.message.MCReceivePrefix'],[session.platform,session.userId])).map(element => element.attrs.content).join('') + output,
+              "text": (this.ctx.i18n.render([this.config.locale? this.config.locale:'zh-CN'], ['minecraft-sync-msg.message.MCReceivePrefix'],[session.platform,data.card || data.nickname])).map(element => element.attrs.content).join('') + output,
               "color": color || "white"
             }
           ]

@@ -1,7 +1,7 @@
 {
   "name": "@ajchen/koishi-plugin-minecraft-sync-msg",
   "description": "使用鹊桥插件v0.3.x与minecraft服务器交互！",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "homepage": "https://blog.iin0.cn/views/myblog/mc/koishiandmc.html",
