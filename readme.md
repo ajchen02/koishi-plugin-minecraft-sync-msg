@@ -12,6 +12,47 @@
 rcon并非完全跟控制台一样所有命令都会有反馈
 
 # CHANGELOG
+## v3.0.2
+### 新增
+* 新增连接消息相关本地化（不包含logger）
+`connectedToWS`连上WS发送的消息（兼容WSserver）  
+`disconnectedFromWS`断开WS发送的消息（兼容WSserver）  
+`connectionErrorWS`WS连接出错发送的消息（兼容WSserver）  
+* 对于WSserver的用户而言消息发送未完全本地化，因为WSclient和WSserver的处理方式不兼容同一套本地化，后续会想办法分开
+
+## v3.0.1
+### 修改
+* 修改了本地化节点`minecraft-sync-msg.message.MCReceivePrefix`,{0}为聊天平台，{1}为平台用户名，{2}为用户id（为了区分相同用户名）
+
+## v3.0.0
+### 注意
+**此版本后需要配合鹊桥v0.3.x才能正常使用**
+### 新增
+* 新增成就上报，但是没有做本地化 **该事件暂不建议在koishi端订阅**
+* 新增执行命令返回，但是这个所有命令都会返回，需要在鹊桥端优化 **该事件暂不建议在koishi端订阅**
+### 修复
+* 修复了插件重载或重启后整个koishi重启的问题
+
+## v3.0.0-beta.2
+### 注意
+**此版本后需要配合鹊桥v0.3.x才能正常使用**
+### 修复
+* 修复了mc消息无法发送到群聊的问题
+* 优化了重启无限重连的问题
+
+## v3.0.0-beta.1
+### 注意
+**此版本后需要配合鹊桥v0.3.x才能正常使用**
+### 修复
+* 修复RCON命令发送逻辑，感谢大佬[GoFightNow](https://github.com/GoFightNow)
+
+## v2.1.0-beta.2
+### 注意
+**此版本后需要配合鹊桥v0.3.x才能正常使用**
+### 修复
+* 修复消息发送api，感谢大佬[@ajchen02](https://github.com/ajchen02)
+* 优化插件重启后重复链接的bug
+
 ## v2.3.0
 ### 新增
 * 支持Reuseable，支持Dispose

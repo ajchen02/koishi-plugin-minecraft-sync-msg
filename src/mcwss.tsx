@@ -68,7 +68,7 @@ class mcWss {
             
             if (!this.conf.hideConnect) this.ctx.bots.forEach(async (bot: Bot) => {
                 const channels = this.conf.sendToChannel.filter(str => str.includes(`${bot.platform}`)).map(str => str.replace(`${bot.platform}:`, ''));
-                if (!this.conf.hideConnect) bot.broadcast(channels, "Websocket客户端连接成功!", 0);
+                if (!this.conf.hideConnect) bot.broadcast(channels, this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.connection.connectedToWS`],{}), 0);
             });
 
             // 添加到连接的客户端集合
@@ -81,9 +81,7 @@ class mcWss {
                 let eventName = data.event_name? getListeningEvent(data.event_name):'';
                 if (!getSubscribedEvents(this.conf.event).includes(eventName)) return
 
-                // let sendMsg = getSubscribedEvents(this.conf.event).includes(eventName)? `[${data.server_name}](${eventTrans[eventName].name}) ${eventTrans[eventName].action? data.player?.nickname+' ':''}${(eventTrans[eventName].action? eventTrans[eventName].action+' ':'')}${data.message? data.message:''}`:''
-                // let sendMsg:any = h.unescape(sendMsg).replaceAll('&amp;','&').replaceAll(/<\/?template>/gi,'').replaceAll(/§./g,'')
-                let sendMsg:any = h.unescape(data.message ? data.message : '').replaceAll('&amp;','&').replaceAll(/<\/?template>/gi,'').replaceAll(/§./g,'')
+                let sendMsg:any = h.unescape(data.message ? data.message : data.command? data.command : '' ).replaceAll('&amp;','&').replaceAll(/<\/?template>/gi,'').replaceAll(/§./g,'')
                 sendMsg = sendMsg.replaceAll(/<json.*\/>/gi,'<json消息>')
                 const imageMatch = sendMsg.match(/(https?|file):\/\/.*\.(jpg|jpeg|webp|ico|gif|jfif|bmp|png)/gi)
                 const sendImage = imageMatch?.[0]
@@ -91,7 +89,10 @@ class mcWss {
                     sendMsg = sendMsg.replace(sendImage, `<img src="${sendImage}" />`)
                 }
 
-                sendMsg = this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.action.${eventName}`],[data.player?.nickname, sendMsg])
+                if (eventName === 'PlayerAchievementEvent' && data.player) {
+                    sendMsg = this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.action.${eventName}`],[data.player?.nickname, data.achievement.text])
+                } else
+                    sendMsg = this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.action.${eventName}`],[data.player?.nickname, sendMsg])
 
                 if(data.server_name)
                   this.ctx.bots.forEach(async (bot: Bot) => {
@@ -101,11 +102,12 @@ class mcWss {
             })
 
             ws.on('error', (err) => {
+                ws?.close();
                 if (!this.conf.hideConnect) this.ctx.bots.forEach(async (bot: Bot) => {
                   const channels = this.conf.sendToChannel.filter(str => str.includes(`${bot.platform}`)).map(str => str.replace(`${bot.platform}:`, ''));
-                  bot.broadcast(channels, "与Websocket客户端断通信时发生错误!", 0);
+                  bot.broadcast(channels,this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.connection.connectionErrorWS`],{}), 0);
                 });
-                this.ctx.logger.error('与Websocket客户端断通信时发生错误!'+err)
+                this.ctx.logger.error(this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.connection.connectionErrorWS`],{}),err)
             });
 
             // 当客户端断开连接时触发
@@ -113,9 +115,9 @@ class mcWss {
                 this.connectedClients.delete(ws);
                 if (!this.conf.hideConnect) this.ctx.bots.forEach(async (bot: Bot) => {
                     const channels = this.conf.sendToChannel.filter(str => str.includes(`${bot.platform}`)).map(str => str.replace(`${bot.platform}:`, ''));
-                    bot.broadcast(channels, "与Websocket客户端断开连接!", 0);
+                    bot.broadcast(channels, this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.connection.disconnectedFromWS`],{}), 0);
                 });
-                this.ctx.logger.error('非正常与Websocket客户端断开连接!')
+                this.ctx.logger.error(this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.connection.disconnectedFromWS`],{}))
             });
         });
     }
@@ -133,6 +135,7 @@ class mcWss {
                     let msg: string = session.content.replaceAll('&amp;', '&').replaceAll(/<\/?template>/gi, '').replace(this.conf.sendprefix, '')
                     .replaceAll(/<json.*\/>/gi,'<json消息>').replaceAll(/<video.*\/>/gi,'<视频消息>').replaceAll(/<audio.*\/>/gi,'<音频消息>').replaceAll(/<img.*\/>/gi, `[[CICode,url=${imgurl}]]`)
                     .replaceAll(/<at.*\/>/gi,`@[${h.select(session.content, 'at')[0]?.attrs?.name? h.select(session.content, 'at')[0]?.attrs?.name:h.select(session.content, 'at')[0]?.attrs?.id}]`)
+                    const data = await session.bot.internal.getGroupMemberInfo(session.guildId!, session.userId)
                     if (this.connectedClients.size > 0) {
                         let msgData = {
                             "api": "broadcast",
@@ -140,7 +143,7 @@ class mcWss {
                                 "message": [
                                     {
                                         // text: `(${session.platform})[${session.event.user.name}] ` + extractAndRemoveColor(msg).output,
-                                        text: (this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], ['minecraft-sync-msg.message.MCReceivePrefix'],[session.platform,session.userId])).map(element => element.attrs?.content).join('') + extractAndRemoveColor(msg).output,
+                                        text: (this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], ['minecraft-sync-msg.message.MCReceivePrefix'],[session.platform,data.card || data.nickname, session.userId])).map(element => element.attrs?.content).join('') + extractAndRemoveColor(msg).output,
                                         color: extractAndRemoveColor(msg).color ? extractAndRemoveColor(msg).color : "white"
                                     }   
                                 ]
@@ -160,10 +163,10 @@ class mcWss {
                         });
                         
                         if (!sent) {
-                            session.send('发送失败! 没有可用的WebSocket连接。');
+                            session.send(this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.connection.connectionErrorWS`],{}));
                         }
                     } else {
-                        session.send('发送失败! 没有可用的WebSocket连接。');
+                            session.send(this.ctx.i18n.render([this.conf.locale? this.conf.locale:'zh-CN'], [`minecraft-sync-msg.connection.connectionErrorWS`],{}));
                     }
                 }
             }
