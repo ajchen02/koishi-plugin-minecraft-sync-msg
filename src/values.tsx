@@ -71,9 +71,9 @@ export const rconConf = Schema.object({
     cannotCmd: Schema.array(String).default(['restart','stop']).description('不能使用的命令'),
 }).collapse().description("RCON配置")
 
-export const eventList = ['AsyncPlayerChatEvent', 'PlayerCommandPreprocessEvent', 'PlayerDeathEvent', 'PlayerJoinEvent', 'PlayerQuitEvent', 'PlayerAchievementEvent'];
+export const eventList = ['PlayerChatEvent', 'PlayerCommandPreprocessEvent', 'PlayerDeathEvent', 'PlayerJoinEvent', 'PlayerQuitEvent', 'PlayerAchievementEvent'];
 // export const eventTrans = {
-//     AsyncPlayerChatEvent: {
+//     PlayerChatEvent: {
 //         name: "聊天信息",
 //         action: '说'
 //     },
@@ -112,13 +112,13 @@ export function getSubscribedEvents(binaryInput: number): string[] {
 
 // 事件映射变量
 const eventMap = {
-    AsyncPlayerChatEvent: 'AsyncPlayerChatEvent',
-    ServerMessageEvent: 'AsyncPlayerChatEvent',
-    ServerChatEvent: 'AsyncPlayerChatEvent',
-    NeoServerChatEvent: 'AsyncPlayerChatEvent',
-    MinecraftPlayerChatEvent: 'AsyncPlayerChatEvent',
-    BaseChatEvent: 'AsyncPlayerChatEvent',
-    PlayerChatEvent: 'AsyncPlayerChatEvent',
+    PlayerChatEvent: 'PlayerChatEvent',
+    ServerMessageEvent: 'PlayerChatEvent',
+    ServerChatEvent: 'PlayerChatEvent',
+    NeoServerChatEvent: 'PlayerChatEvent',
+    MinecraftPlayerChatEvent: 'PlayerChatEvent',
+    BaseChatEvent: 'PlayerChatEvent',
+    AsyncPlayerChatEvent: 'PlayerChatEvent',
 
     PlayerCommandPreprocessEvent: 'PlayerCommandPreprocessEvent',
     ServerCommandMessageEvent: 'PlayerCommandPreprocessEvent',
@@ -149,7 +149,7 @@ const eventMap = {
     VelocityDisconnectEvent: 'PlayerQuitEvent',
     VelocityCommandExecuteEvent: 'PlayerCommandPreprocessEvent',
     VelocityLoginEvent: 'PlayerJoinEvent',
-    VelocityPlayerChatEvent: 'AsyncPlayerChatEvent',
+    VelocityPlayerChatEvent: 'PlayerChatEvent',
 
     PlayerAchievementEvent: 'PlayerAchievementEvent',
 };
