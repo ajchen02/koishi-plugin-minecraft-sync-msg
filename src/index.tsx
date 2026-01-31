@@ -380,18 +380,27 @@ class MinecraftSyncMsg {
 
   private setupDisposeHandler() {
     this.ctx.on('dispose', async () => {
-      this.ctx.registry.delete(mcWss);
-      this.ctx.registry.delete(MinecraftSyncMsg);
-      // 关掉之前的ws连接避免消息重复发送
-      await new Promise(() => {
-        this.ws?.close();
-        this.ws?.removeAllListeners();
-        this.ws? this.clearReconnectInterval():undefined;
-      }) 
-      this.ws = null;
-      this.isDisposing = true;
+      this.isDisposing = true
+      await this.dispose()
+      this.isDisposing = false
     })
-    this.isDisposing = false;
+  }
+
+  private async dispose() {
+    if (this.pl_fork){
+      await this.pl_fork.dispose();
+      this.ctx.registry.delete(mcWss)
+    }
+    
+    if (this.ws) {
+      this.ws.removeAllListeners()
+      if (this.ws.readyState === WebSocket.OPEN) {
+        this.ws.close()
+      }
+      this.ws = undefined
+    }
+
+    this.clearReconnectInterval()
   }
 }
 

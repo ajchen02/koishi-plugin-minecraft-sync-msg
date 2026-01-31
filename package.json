@@ -1,6 +1,6 @@
 {
   "name": "@ajchen/koishi-plugin-minecraft-sync-msg",
-  "version": "2.3.0",
+  "version": "3.1.2",
   "description": "搭配鹊桥v0.3.x的mc消息互联插件 (更新前请停止插件)",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
