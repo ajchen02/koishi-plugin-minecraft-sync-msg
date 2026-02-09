@@ -394,6 +394,13 @@ class MinecraftSyncMsg {
     
     if (this.ws) {
       this.ws.removeAllListeners()
+      if (this.ws.readyState === WebSocket.CONNECTING) {
+        logger.info('WebSocket链接正在初始化；尝试强制断开')
+        // 力大砖飞！
+        // this.ws.onclose = () => {}
+        this.ws.onerror = () => {}
+        this.ws.close()
+      }
       if (this.ws.readyState === WebSocket.OPEN) {
         this.ws.close()
       }
